@@ -1,20 +1,5 @@
 #!/bin/bash
 
-# path for final wrapper scripts
-MYBINPATH="/usr/local/bin"
-
-# location for virtualenvs
-MYENVPATH="/usr/local/virtualenvs"
-
-# is sudo required to write to the above directories?
-DOISUDO="yes"
-
-# name of the virtualenv
-MYINSTALLPATH="${MYENVPATH}/supernova"
-
-# direct links
-HELPERADDON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
-
 # text formatting
 _und=$(tput sgr 0 1) # underline
 _bld=$(tput bold)    # bold
@@ -47,12 +32,20 @@ soft_fail() {
 
 
 set_variables() {
-	# set the sudo variable
-	if [[ ${DOISUDO} == "yes" ]]; then
-		SUDO="sudo"
+	# https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders
+	if [[ -n ${XDG_DATA_HOME} ]]; then
+		DATA_HOME=${XDG_DATA_HOME}
 	else
-		SUDO=""
+		DATA_HOME=${HOME}/.local/share
 	fi
+
+	# various paths
+	BIN_PATH="${DATA_HOME}/bin" 		# path for wrapper scripts
+	ENV_PATH="${DATA_HOME}/virtenvs" 	# parent directory of the virtualenv
+	INSTALL_PATH="${ENV_PATH}/supernova" 	# full path of the virtualenv
+
+	# url for keyring helper
+	HELPER_ADD_ON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
 
 	# OS detection
 	if [[ -f /etc/os-release ]]; then
@@ -110,6 +103,35 @@ set_variables() {
 }
 
 
+do_checks() {
+	# checks for BIN_PATH
+	echo -n "checking for directory ${BIN_PATH}..."
+	if [[ -d ${BIN_PATH} ]]; then
+		pass
+	else
+		echo -n "creating..."
+		mkdir -p ${BIN_PATH} || fail
+		pass
+	fi
+	echo -n "checking for ${BIN_PATH} in PATH..."
+	if [[ ":${PATH}:" == *":${BIN_PATH}:"* ]]; then
+		pass
+	else
+		fail
+	fi
+
+	# checks for ENV_PATH
+	echo -n "checking for directory ${ENV_PATH}..."
+	if [[ -d ${ENV_PATH} ]]; then
+		pass
+	else
+		echo -n "creating..."
+		mkdir -p ${ENV_PATH} || fail
+		pass
+	fi
+}
+
+
 pkg_test() {
 	# test if packages are installed
 	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc; do
@@ -150,65 +172,47 @@ do_install() {
 	# test if there already is scripts in our desired location
 	echo -n "checking for wrapper script conflict..."
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		if [[ -f ${MYBINPATH}/${each} ]]; then
-			fail "${MYBINPATH}/${each} already exists"
+		if [[ -f ${BIN_PATH}/${each} ]]; then
+			fail "${BIN_PATH}/${each} already exists"
 		fi
 	done
 	pass
 
-	# test for directories, create if needed
-	echo -n "checking for directory ${MYBINPATH}..."
-	if [[ -d ${MYBINPATH} ]]; then
-		pass
-	else
-		echo -n "creating..."
-		${SUDO} mkdir -p ${MYBINPATH} || fail
-		pass
-	fi
-	echo -n "checking for directory ${MYENVPATH}..."
-	if [[ -d ${MYENVPATH} ]]; then
-		pass
-	else
-		echo -n "creating..."
-		${SUDO} mkdir -p ${MYENVPATH} || fail
-		pass
-	fi
-
 	# create isolated python environment
-	echo -n "creating isolated python environment ${MYINSTALLPATH}..."
-	${SUDO} ${VIRTUALENV} --no-site-packages ${MYINSTALLPATH} &> /dev/null && pass || fail
+	echo -n "creating isolated python environment ${INSTALL_PATH}..."
+	${SUDO} ${VIRTUALENV} --no-site-packages ${INSTALL_PATH} &> /dev/null && pass || fail
 
 	# activate the virtual environment
-	echo -n "activating virutalenv ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate &> /dev/null && pass || fail "could not activate ${MYINSTALLPATH}"
+	echo -n "activating virutalenv ${INSTALL_PATH}..."
+	. ${INSTALL_PATH}/bin/activate &> /dev/null && pass || fail "could not activate ${INSTALL_PATH}"
 
 	# install pip packages
 	echo -n "installing pbr..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install pbr &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install pbr &> /dev/null && pass || fail
 	echo -n "installing python-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
 	echo -n "installing rackspace-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "installing supernova..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install supernova &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install supernova &> /dev/null && pass || fail
 	echo -n "installing supernova-keyring-helper..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install ${HELPERADDON} &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install ${HELPER_ADD_ON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip freeze 2>&1 | ${SUDO} tee ${MYINSTALLPATH}/freeze.$(date +%F_%T).out &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip freeze 2>&1 | ${SUDO} tee ${INSTALL_PATH}/freeze.$(date +%F_%T).out &> /dev/null && pass || fail
 
 	# deactivate the virtual environment
-	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
-	deactivate &> /dev/null && pass || fail "could not deactivate ${MYINSTALLPATH}"
+	echo -n "deactivating virutalenv ${INSTALL_PATH}..."
+	deactivate &> /dev/null && pass || fail "could not deactivate ${INSTALL_PATH}"
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		cat <<- EOF | ${SUDO} tee ${MYBINPATH}/${each} &> /dev/null
+		cat <<- EOF | ${SUDO} tee ${BIN_PATH}/${each} &> /dev/null
 		#!/bin/bash
-		. ${MYINSTALLPATH}/bin/activate
-		${MYINSTALLPATH}/bin/${each} \${@}
+		. ${INSTALL_PATH}/bin/activate
+		${INSTALL_PATH}/bin/${each} \${@}
 		EOF
-		${SUDO} chmod +x ${MYBINPATH}/${each}
+		${SUDO} chmod +x ${BIN_PATH}/${each}
 	done
 	pass
 
@@ -224,26 +228,26 @@ do_upgrade() {
 	pkg_test
 
 	# activate the virtual environment
-	echo -n "activating virutalenv ${MYINSTALLPATH}..."
-	. ${MYINSTALLPATH}/bin/activate &> /dev/null && pass || fail "could not activate ${MYINSTALLPATH}"
+	echo -n "activating virutalenv ${INSTALL_PATH}..."
+	. ${INSTALL_PATH}/bin/activate &> /dev/null && pass || fail "could not activate ${INSTALL_PATH}"
 
 	# upgrade pip packages
 	echo -n "updating pbr..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade pbr &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade pbr &> /dev/null && pass || fail
 	echo -n "updating python-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade python-novaclient &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade python-novaclient &> /dev/null && pass || fail
 	echo -n "updating rackspace-novaclient..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "updating supernova..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
 	echo -n "updating supernova-keyring-helper..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip install --upgrade ${HELPERADDON} &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade ${HELPER_ADD_ON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
-	${SUDO} ${MYINSTALLPATH}/bin/pip freeze 2>&1 | ${SUDO} tee ${MYINSTALLPATH}/freeze.$(date +%s).out &> /dev/null && pass || fail
+	${SUDO} ${INSTALL_PATH}/bin/pip freeze 2>&1 | ${SUDO} tee ${INSTALL_PATH}/freeze.$(date +%s).out &> /dev/null && pass || fail
 
 	# deactivate the virtual environment
-	echo -n "deactivating virutalenv ${MYINSTALLPATH}..."
-	deactivate &> /dev/null && pass || fail "could not deactivate ${MYINSTALLPATH}"
+	echo -n "deactivating virutalenv ${INSTALL_PATH}..."
+	deactivate &> /dev/null && pass || fail "could not deactivate ${INSTALL_PATH}"
 
 	echo "${_bld}upgrade process complete${_res}"
 }
@@ -251,21 +255,21 @@ do_upgrade() {
 
 do_remove() {
 	# remove installation path
-	if [[ -d ${MYINSTALLPATH} ]]; then
-		echo -n "remove virtualenv directory ${_bld}${MYINSTALLPATH}${_res}? [y/N] "; read x
+	if [[ -d ${INSTALL_PATH} ]]; then
+		echo -n "remove virtualenv directory ${_bld}${INSTALL_PATH}${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
 			echo -n "removing virtualenv directory..."
-			${SUDO} rm -rf ${MYINSTALLPATH} && pass || fail
+			${SUDO} rm -rf ${INSTALL_PATH} && pass || fail
 		fi
 	fi
 
 	# delete wrapper scripts
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		if [[ -f ${MYBINPATH}/${each} ]]; then
-			echo -n "remove wrapper script ${_bld}${MYBINPATH}/${each}${_res}? [y/N] "; read x
+		if [[ -f ${BIN_PATH}/${each} ]]; then
+			echo -n "remove wrapper script ${_bld}${BIN_PATH}/${each}${_res}? [y/N] "; read x
 			if [[ "${x}" == "y" ]]; then
 				echo -n "removing wrapper script..."
-				${SUDO} rm -f ${MYBINPATH}/${each} && pass || fail
+				${SUDO} rm -f ${BIN_PATH}/${each} && pass || fail
 			fi
 		fi
 	done
@@ -286,16 +290,16 @@ do_remove() {
 do_status() {
 	# show executables
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		echo -n "testing executable ${MYBINPATH}/${each}..."
-		if [[ -x ${MYBINPATH}/${each} ]]; then
+		echo -n "testing executable ${BIN_PATH}/${each}..."
+		if [[ -x ${BIN_PATH}/${each} ]]; then
 			pass
 		else
 			soft_fail
 		fi
 	done
 	# show virtualenvs
-	echo -n "testing directory ${MYINSTALLPATH}..."
-	if [[ -d ${MYINSTALLPATH} ]]; then
+	echo -n "testing directory ${INSTALL_PATH}..."
+	if [[ -d ${INSTALL_PATH} ]]; then
 		pass
 	else
 		soft_fail
@@ -327,6 +331,7 @@ if [[ ${#} -ne 1 ]]; then
 fi
 
 set_variables
+do_checks
 
 case ${1} in
 	"install")			do_install;;
