@@ -180,7 +180,7 @@ do_install() {
 
 	# create isolated python environment
 	echo -n "creating isolated python environment ${INSTALL_PATH}..."
-	${SUDO} ${VIRTUALENV} --no-site-packages ${INSTALL_PATH} &> /dev/null && pass || fail
+	${VIRTUALENV} --no-site-packages ${INSTALL_PATH} &> /dev/null && pass || fail
 
 	# activate the virtual environment
 	echo -n "activating virutalenv ${INSTALL_PATH}..."
@@ -188,17 +188,17 @@ do_install() {
 
 	# install pip packages
 	echo -n "installing pbr..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install pbr &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install pbr &> /dev/null && pass || fail
 	echo -n "installing python-novaclient..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install python-novaclient &> /dev/null && pass || fail
 	echo -n "installing rackspace-novaclient..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "installing supernova..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install supernova &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install supernova &> /dev/null && pass || fail
 	echo -n "installing supernova-keyring-helper..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install ${HELPER_ADD_ON} &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install ${HELPER_ADD_ON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
-	${SUDO} ${INSTALL_PATH}/bin/pip freeze 2>&1 | ${SUDO} tee ${INSTALL_PATH}/freeze.$(date +%F_%T).out &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip freeze 2>&1 | tee ${INSTALL_PATH}/freeze.$(date +%F_%T).out &> /dev/null && pass || fail
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${INSTALL_PATH}..."
@@ -207,12 +207,12 @@ do_install() {
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
 	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		cat <<- EOF | ${SUDO} tee ${BIN_PATH}/${each} &> /dev/null
+		cat <<- EOF | tee ${BIN_PATH}/${each} &> /dev/null
 		#!/bin/bash
 		. ${INSTALL_PATH}/bin/activate
 		${INSTALL_PATH}/bin/${each} \${@}
 		EOF
-		${SUDO} chmod +x ${BIN_PATH}/${each}
+		chmod +x ${BIN_PATH}/${each}
 	done
 	pass
 
@@ -233,17 +233,17 @@ do_upgrade() {
 
 	# upgrade pip packages
 	echo -n "updating pbr..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade pbr &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install --upgrade pbr &> /dev/null && pass || fail
 	echo -n "updating python-novaclient..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade python-novaclient &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install --upgrade python-novaclient &> /dev/null && pass || fail
 	echo -n "updating rackspace-novaclient..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "updating supernova..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
 	echo -n "updating supernova-keyring-helper..."
-	${SUDO} ${INSTALL_PATH}/bin/pip install --upgrade ${HELPER_ADD_ON} &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip install --upgrade ${HELPER_ADD_ON} &> /dev/null && pass || fail
 	echo -n "saving pip freeze output..."
-	${SUDO} ${INSTALL_PATH}/bin/pip freeze 2>&1 | ${SUDO} tee ${INSTALL_PATH}/freeze.$(date +%s).out &> /dev/null && pass || fail
+	${INSTALL_PATH}/bin/pip freeze 2>&1 | tee ${INSTALL_PATH}/freeze.$(date +%s).out &> /dev/null && pass || fail
 
 	# deactivate the virtual environment
 	echo -n "deactivating virutalenv ${INSTALL_PATH}..."
@@ -259,7 +259,7 @@ do_remove() {
 		echo -n "remove virtualenv directory ${_bld}${INSTALL_PATH}${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
 			echo -n "removing virtualenv directory..."
-			${SUDO} rm -rf ${INSTALL_PATH} && pass || fail
+			rm -rf ${INSTALL_PATH} && pass || fail
 		fi
 	fi
 
@@ -269,7 +269,7 @@ do_remove() {
 			echo -n "remove wrapper script ${_bld}${BIN_PATH}/${each}${_res}? [y/N] "; read x
 			if [[ "${x}" == "y" ]]; then
 				echo -n "removing wrapper script..."
-				${SUDO} rm -f ${BIN_PATH}/${each} && pass || fail
+				rm -f ${BIN_PATH}/${each} && pass || fail
 			fi
 		fi
 	done
