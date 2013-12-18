@@ -21,3 +21,14 @@ chmod +x /usr/local/bin/supersandbox
             		remove   	remove the environment and wrapper scripts
             		template 	create configuration template file
             		status   	check the status of your installation
+
+    $ supersandbox
+    usage:          supersandbox subcommand
+    
+    description:    Bootstrap a complete supernova environment using virtualenv.
+    
+    subcommands:    install     install the environment and wrapper scripts
+                    upgrade     upgrade the pip pacakges in the environment
+                    remove      remove the environment and wrapper scripts
+                    template    create configuration template file
+                    status      check the status of your installation
