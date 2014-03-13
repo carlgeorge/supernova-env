@@ -43,14 +43,12 @@ set_variables() {
 	# url for keyring helper
 	HELPER_ADD_ON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
 
-	# OS detection
+	# set distro ID
 	if [[ -f /etc/os-release ]]; then
 		eval $(grep ^ID= /etc/os-release)
 		# works on ubuntu, debian, arch, fedora
 	elif [[ -f /etc/redhat-release ]]; then
-		if [[ -f /etc/fedora-release ]]; then
-			ID="fedora"
-		elif [[ -f /etc/centos-release ]]; then
+		if [[ -f /etc/centos-release ]]; then
 			ID="centos"
 		else
 			ID="redhat"
@@ -59,43 +57,36 @@ set_variables() {
 		ID="osx"
 	fi
 
-	# set variables based on OS
-	if [[ "${ID}" == "arch" ]]; then
-		PYTHON="python2"
-		VIRTUALENV="virtualenv2"
-		TESTCMD="pacman -Q"
-	elif [[ "${ID}" == "debian" ]]; then
-		PYTHON="python"
-		PYTHONDEV="python-dev"
-		VIRTUALENV="virtualenv"
-		TESTCMD="dpkg -s"
-	elif [[ "${ID}" == "ubuntu" ]]; then
-		PYTHON="python"
-		PYTHONDEV="python-dev"
-		VIRTUALENV="virtualenv"
-		TESTCMD="dpkg -s"
-	elif [[ "${ID}" == "fedora" ]]; then
-		PYTHON="python"
-		PYTHONDEV="python-devel"
-		VIRTUALENV="virtualenv"
-		TESTCMD="rpm -q"
-	elif [[ "${ID}" == "centos" ]]; then
-		PYTHON="python27"
-		PYTHONDEV="python27-devel"
-		VIRTUALENV="virtualenv-2.7"
-		TESTCMD="rpm -q"
-	elif [[ "${ID}" == "redhat" ]]; then
-		PYTHON="python27"
-		PYTHONDEV="python27-devel"
-		VIRTUALENV="virtualenv-2.7"
-		TESTCMD="rpm -q"
-	# elif [[ "${ID}" == "osx" ]]; then
-	# 	PYTHON=""    		# [[ -d /usr/local/Cellar/python/ ]]
-	# 	VIRTUALENV=""
-	# 	TESTCMD=""
-	else
-		fail "unrecognized OS: ${ID}"
-	fi
+	# set variables based on ID
+	case "${ID}" in
+		'arch')
+			PYTHON="python2"
+			VIRTUALENV="virtualenv2"
+			TESTCMD="pacman -Q"
+			;;
+		'ubuntu'|'debian')
+			PYTHON="python"
+			PYTHONDEV="python-dev"
+			VIRTUALENV="virtualenv"
+			TESTCMD="dpkg -s"
+			;;
+		'fedora')
+			PYTHON="python"
+			PYTHONDEV="python-devel"
+			VIRTUALENV="virtualenv"
+			TESTCMD="rpm -q"
+			;;
+		'centos'|'redhat')
+			PYTHON="python27"
+			PYTHONDEV="python27-devel"
+			VIRTUALENV="virtualenv-2.7"
+			TESTCMD="rpm -q"
+			;;
+		*)
+			fail "unrecognized OS: ${ID}"
+			exit 1
+			;;
+	esac
 }
 
 
