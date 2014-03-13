@@ -37,7 +37,7 @@ set_variables() {
 
 	# various paths
 	BIN_PATH="${DATA_HOME}/bin" 		# path for wrapper scripts
-	ENV_PATH="${DATA_HOME}/virtenvs" 	# parent directory of the virtualenv
+	ENV_PATH="${DATA_HOME}/virtualenv" 	# parent directory of the virtualenv
 	INSTALL_PATH="${ENV_PATH}/supernova" 	# full path of the virtualenv
 
 	# url for keyring helper
