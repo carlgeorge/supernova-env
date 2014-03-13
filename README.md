@@ -5,8 +5,8 @@ Bootstrap a complete supernova environment using virtualenv.
 ## Installation
 
 ```
-curl -s https://raw.github.com/cgtx/supersandbox/master/supersandbox > /usr/local/bin/supersandbox
-chmod +x /usr/local/bin/supersandbox
+curl -s https://raw.github.com/cgtx/supersandbox/master/supersandbox > supersandbox
+chmod +x supersandbox
 ```
 
 ## Usage
