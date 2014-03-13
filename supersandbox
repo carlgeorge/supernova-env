@@ -33,11 +33,7 @@ soft_fail() {
 
 set_variables() {
 	# https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders
-	if [[ -n ${XDG_DATA_HOME} ]]; then
-		DATA_HOME=${XDG_DATA_HOME}
-	else
-		DATA_HOME=${HOME}/.local/share
-	fi
+	DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 
 	# various paths
 	BIN_PATH="${DATA_HOME}/bin" 		# path for wrapper scripts
