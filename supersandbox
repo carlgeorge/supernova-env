@@ -147,6 +147,7 @@ do_template() {
 	OS_PASSWORD=USE_KEYRING
 	OS_REGION_NAME=USE_KEYRING
 	NOVA_RAX_AUTH=1
+	# vim: set ft=dosini :
 	EOF
 	pass
 }
