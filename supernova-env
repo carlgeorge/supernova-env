@@ -297,6 +297,14 @@ do_remove() {
 
 
 do_status() {
+	# show virtualenvs
+	echo -n "testing directory ${INSTALL_PATH}..."
+	if [[ -d ${INSTALL_PATH} ]]; then
+		pass
+	else
+		soft_fail
+	fi
+
 	# show executables
 	for SCRIPT in ${SCRIPTS[@]}; do
 		echo -n "testing executable ${BIN_PATH}/${SCRIPT}..."
@@ -306,13 +314,6 @@ do_status() {
 			soft_fail
 		fi
 	done
-	# show virtualenvs
-	echo -n "testing directory ${INSTALL_PATH}..."
-	if [[ -d ${INSTALL_PATH} ]]; then
-		pass
-	else
-		soft_fail
-	fi
 }
 
 
