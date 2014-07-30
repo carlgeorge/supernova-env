@@ -169,9 +169,9 @@ do_install() {
 
 	# test if there already is scripts in our desired location
 	echo -n "checking for wrapper script conflict..."
-	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		if [[ -f ${BIN_PATH}/${each} ]]; then
-			fail "${BIN_PATH}/${each} already exists"
+	for SCRIPT in ${SCRIPTS[@]}; do
+		if [[ -f ${BIN_PATH}/${SCRIPT} ]]; then
+			fail "${BIN_PATH}/${SCRIPT} already exists"
 		fi
 	done
 	pass
@@ -266,12 +266,12 @@ do_remove() {
 	fi
 
 	# delete wrapper scripts
-	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		if [[ -f ${BIN_PATH}/${each} ]]; then
-			echo -n "remove wrapper script ${_bld}${BIN_PATH}/${each}${_res}? [y/N] "; read x
+	for SCRIPT in ${SCRIPTS[@]}; do
+		if [[ -f ${BIN_PATH}/${SCRIPT} ]]; then
+			echo -n "remove wrapper script ${_bld}${BIN_PATH}/${SCRIPT}${_res}? [y/N] "; read x
 			if [[ "${x}" == "y" ]]; then
 				echo -n "removing wrapper script..."
-				rm -f ${BIN_PATH}/${each} && pass || fail
+				rm -f ${BIN_PATH}/${SCRIPT} && pass || fail
 			fi
 		fi
 	done
@@ -291,9 +291,9 @@ do_remove() {
 
 do_status() {
 	# show executables
-	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		echo -n "testing executable ${BIN_PATH}/${each}..."
-		if [[ -x ${BIN_PATH}/${each} ]]; then
+	for SCRIPT in ${SCRIPTS[@]}; do
+		echo -n "testing executable ${BIN_PATH}/${SCRIPT}..."
+		if [[ -x ${BIN_PATH}/${SCRIPT} ]]; then
 			pass
 		else
 			soft_fail
