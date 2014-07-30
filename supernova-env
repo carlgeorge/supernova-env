@@ -151,7 +151,7 @@ pkg_test() {
 
 
 do_template() {
-	# create config file template
+	# print a sample configuration template
 	cat <<-EOF
 	[mine]
 	OS_AUTH_SYSTEM=rackspace
@@ -222,9 +222,6 @@ do_install() {
 		chmod +x ${BIN_PATH}/${SCRIPT}
 	done
 	pass
-
-	# create config file template
-	do_template
 
 	echo "${_bld}installation complete${_res}"
 }
