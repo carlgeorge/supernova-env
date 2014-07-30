@@ -7,8 +7,9 @@ Bootstrap a complete supernova environment using virtualenv.
 Just download the script and put it in your path somewhere.
 
 ```
-curl -s https://raw.github.com/cgtx/supernova-env/master/supernova-env > ~/.local/share/bin/supernova-env
-chmod +x ~/.local/share/bin/supernova-env
+MYSCRIPTS=~/.local/share/bin
+curl -s https://raw.github.com/cgtx/supernova-env/master/supernova-env > ${MYSCRIPTS}/supernova-env
+chmod +x ${MYSCRIPTS}/supernova-env
 ```
 
 ## Usage
