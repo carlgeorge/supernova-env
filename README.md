@@ -1,18 +1,18 @@
-# supersandbox
+# supernova-env
 
 Bootstrap a complete supernova environment using virtualenv.
 
 ## Installation
 
 ```
-curl -s https://raw.github.com/cgtx/supersandbox/master/supersandbox > supersandbox
-chmod +x supersandbox
+curl -s https://raw.github.com/cgtx/supernova-env/master/supernova-env > supernova-env
+chmod +x supernova-env
 ```
 
 ## Usage
 
-    $ supersandbox
-    usage:          supersandbox subcommand
+    $ supernova-env
+    usage:          supernova-env subcommand
     
     description:    Bootstrap a complete supernova environment using virtualenv.
     
