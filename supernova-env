@@ -351,4 +351,4 @@ case ${1} in
 	*)				do_help;;
 esac
 
-# vim: set syntax=sh sw=8 ts=8 :
+# vim: ft=sh sw=8 ts=8
