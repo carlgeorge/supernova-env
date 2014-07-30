@@ -41,7 +41,7 @@ set_variables() {
 	INSTALL_PATH="${ENV_PATH}/supernova" 	# full path of the virtualenv
 
 	# url for keyring helper
-	HELPER_ADD_ON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
+	#HELPER_ADD_ON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
 
 	# set distro ID
 	if [[ -f /etc/os-release ]]; then
