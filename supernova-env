@@ -171,6 +171,9 @@ do_template() {
 
 
 do_install() {
+	# basic system checks
+	do_checks
+
 	# test if packages are installed
 	pkg_test
 
@@ -231,6 +234,9 @@ do_install() {
 
 
 do_upgrade() {
+	# basic system checks
+	do_checks
+
 	# test if packages are installed
 	pkg_test
 
@@ -341,7 +347,6 @@ if [[ ${#} -ne 1 ]]; then
 fi
 
 set_variables
-do_checks
 
 case ${1} in
 	"install")			do_install;;
