@@ -72,6 +72,9 @@ set_variables() {
 			VIRTUALENV="virtualenv-2.7"
 			TESTCMD="rpm -q"
 			;;
+		"osx")
+			VIRTUALENV="virtualenv"
+			;;
 		*)
 			fail "unrecognized OS: ${ID}"
 			;;
@@ -129,16 +132,22 @@ do_checks() {
 
 pkg_test() {
 	# test if packages are installed
-	for PKG in ${PKGS[@]}; do
-		if [[ -n ${PKG} ]]; then
-			echo -n "checking for ${PKG} package..."
-			if ${TESTCMD} ${PKG} &> /dev/null; then
-				pass
-			else
-				fail "install ${PKG} and try again"
-			fi
+	if [[ ${ID} == "osx" ]]; then
+		if ! which ${VIRTUALENV} &> /dev/null; then
+			fail "unable to find virtualenv in your PATH\n\nhttp://docs.python-guide.org/en/latest/starting/install/osx/"
 		fi
-	done
+	else
+		for PKG in ${PKGS[@]}; do
+			if [[ -n ${PKG} ]]; then
+				echo -n "checking for ${PKG} package..."
+				if ${TESTCMD} ${PKG} &> /dev/null; then
+					pass
+				else
+					fail "install ${PKG} and try again"
+				fi
+			fi
+		done
+	fi
 }
 
 
