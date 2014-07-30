@@ -82,7 +82,8 @@ set_variables() {
 
 	# https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders
 	DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
-	SAMPLE_CONFIG=${XDG_CONFIG_HOME:-${HOME}/.config}/supernova.sample
+	CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
+	SAMPLE_CONFIG=${CONFIG_HOME}/supernova.sample
 
 	# various paths
 	BIN_PATH="${DATA_HOME}/bin" 		# path for wrapper scripts
@@ -125,6 +126,16 @@ do_checks() {
 	else
 		echo -n "creating..."
 		mkdir -p ${ENV_PATH} || fail
+		pass
+	fi
+
+	# checks for CONFIG_HOME
+	echo -n "checking for directory ${CONFIG_HOME}..."
+	if [[ -d ${CONFIG_HOME} ]]; then
+		pass
+	else
+		echo -n "creating..."
+		mkdir -p ${CONFIG_HOME} || fail
 		pass
 	fi
 }
