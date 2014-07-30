@@ -50,27 +50,25 @@ set_variables() {
 	fi
 
 	# set variables based on ID
+	PKGS=(gcc)
 	case "${ID}" in
 		"arch")
-			PYTHON="python2"
+			PKGS+=(python2 python2-virtualenv)
 			VIRTUALENV="virtualenv2"
 			TESTCMD="pacman -Q"
 			;;
 		"ubuntu"|"debian")
-			PYTHON="python"
-			PYTHONDEV="python-dev"
+			PKGS+=(python python-dev python-virtualenv)
 			VIRTUALENV="virtualenv"
 			TESTCMD="dpkg -s"
 			;;
 		"fedora")
-			PYTHON="python"
-			PYTHONDEV="python-devel"
+			PKGS+=(python python-devel python-virtualenv)
 			VIRTUALENV="virtualenv"
 			TESTCMD="rpm -q"
 			;;
 		"centos"|"redhat")
-			PYTHON="python27"
-			PYTHONDEV="python27-devel"
+			PKGS+=(python27 python27-devel python27-virtualenv)
 			VIRTUALENV="virtualenv-2.7"
 			TESTCMD="rpm -q"
 			;;
@@ -131,13 +129,13 @@ do_checks() {
 
 pkg_test() {
 	# test if packages are installed
-	for pkg in ${PYTHON} ${PYTHONDEV} ${PYTHON}-virtualenv gcc; do
-		if [[ -n ${pkg} ]]; then
-			echo -n "checking for ${pkg} package..."
-			if ${TESTCMD} ${pkg} &> /dev/null; then
+	for PKG in ${PKGS[@]}; do
+		if [[ -n ${PKG} ]]; then
+			echo -n "checking for ${PKG} package..."
+			if ${TESTCMD} ${PKG} &> /dev/null; then
 				pass
 			else
-				fail "install ${pkg} and try again"
+				fail "install ${PKG} and try again"
 			fi
 		fi
 	done
