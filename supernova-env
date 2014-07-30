@@ -82,8 +82,6 @@ set_variables() {
 
 	# https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders
 	DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
-	CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
-	SAMPLE_CONFIG=${CONFIG_HOME}/supernova.sample
 
 	# various paths
 	BIN_PATH="${DATA_HOME}/bin" 		# path for wrapper scripts
@@ -128,16 +126,6 @@ do_checks() {
 		mkdir -p ${ENV_PATH} || fail
 		pass
 	fi
-
-	# checks for CONFIG_HOME
-	echo -n "checking for directory ${CONFIG_HOME}..."
-	if [[ -d ${CONFIG_HOME} ]]; then
-		pass
-	else
-		echo -n "creating..."
-		mkdir -p ${CONFIG_HOME} || fail
-		pass
-	fi
 }
 
 
@@ -164,8 +152,7 @@ pkg_test() {
 
 do_template() {
 	# create config file template
-	echo -n "creating configuration template file ${SAMPLE_CONFIG} ..."
-	cat >> ${SAMPLE_CONFIG} <<-EOF
+	cat <<-EOF
 	[mine]
 	OS_AUTH_SYSTEM=rackspace
 	OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
@@ -177,7 +164,6 @@ do_template() {
 	NOVA_RAX_AUTH=1
 	# vim: set ft=dosini :
 	EOF
-	pass
 }
 
 
@@ -300,15 +286,6 @@ do_remove() {
 		fi
 	done
 
-	# remove config file template
-	if [[ -f ${SAMPLE_CONFIG} ]]; then
-		echo -n "remove configuration template file ${_bld}${SAMPLE_CONFIG}${_res}? [y/N] "; read x
-		if [[ "${x}" == "y" ]]; then
-			echo -n "removing configuration template file..."
-			rm -f ${SAMPLE_CONFIG} && pass || fail
-		fi
-	fi
-
 	echo "${_bld}uninstall complete${_res}"
 }
 
@@ -345,7 +322,7 @@ do_help() {
 	echo -e "${SUBCOMMANDS}:\tinstall \tinstall the environment and wrapper scripts"
 	echo -e "\t\tupgrade  \tupgrade the pip pacakges in the environment"
 	echo -e "\t\tremove   \tremove the environment and wrapper scripts"
-	echo -e "\t\ttemplate \tcreate configuration template file"
+	echo -e "\t\ttemplate \tprint a sample configuration template"
 	echo -e "\t\tstatus   \tcheck the status of your installation"
 	exit 1
 }
