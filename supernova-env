@@ -73,7 +73,6 @@ set_variables() {
 			;;
 		*)
 			fail "unrecognized OS: ${ID}"
-			exit 1
 			;;
 	esac
 
