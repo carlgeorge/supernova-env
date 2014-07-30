@@ -168,12 +168,6 @@ do_template() {
 
 
 do_install() {
-	# basic system checks
-	do_checks
-
-	# test if packages are installed
-	pkg_test
-
 	# test if there already is scripts in our desired location
 	echo -n "checking for wrapper script conflict..."
 	for SCRIPT in ${SCRIPTS[@]}; do
@@ -182,6 +176,12 @@ do_install() {
 		fi
 	done
 	pass
+
+	# basic system checks
+	do_checks
+
+	# test if packages are installed
+	pkg_test
 
 	# create isolated python environment
 	echo -n "creating isolated python environment ${INSTALL_PATH}..."
