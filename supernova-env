@@ -7,6 +7,9 @@ _red=$(tput setaf 1) # red
 _gre=$(tput setaf 2) # green
 _res=$(tput sgr0)    # reset
 
+# https://github.com/cgtx/supernova-keyring-helper
+# change to 1 to enable
+WITH_KEYRING_HELPER=0
 
 pass() {
 	# print a bold green check
@@ -84,8 +87,14 @@ set_variables() {
 	ENV_PATH="${DATA_HOME}/virtualenv" 	# parent directory of the virtualenv
 	INSTALL_PATH="${ENV_PATH}/supernova" 	# full path of the virtualenv
 
-	# url for keyring helper
-	#HELPER_ADD_ON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
+	# define our wrapper scripts
+	SCRIPTS=(nova supernova supernova-keyring)
+
+	# optional keyring helper stuff
+	if [[ ${WITH_KEYRING_HELPER} -eq 1 ]]; then
+		HELPER_ADD_ON="https://github.com/cgtx/supernova-keyring-helper/archive/v0.4.tar.gz"
+		SCRIPTS+=(supernova-keyring-helper)
+	fi
 
 }
 
@@ -183,8 +192,10 @@ do_install() {
 	${INSTALL_PATH}/bin/pip install rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "installing supernova..."
 	${INSTALL_PATH}/bin/pip install supernova &> /dev/null && pass || fail
-	echo -n "installing supernova-keyring-helper..."
-	${INSTALL_PATH}/bin/pip install ${HELPER_ADD_ON} &> /dev/null && pass || fail
+	if [[ ${WITH_KEYRING_HELPER} -eq 1 ]]; then
+		echo -n "installing supernova-keyring-helper..."
+		${INSTALL_PATH}/bin/pip install ${HELPER_ADD_ON} &> /dev/null && pass || fail
+	fi
 	echo -n "saving pip freeze output..."
 	${INSTALL_PATH}/bin/pip freeze 2>&1 | tee ${INSTALL_PATH}/freeze.$(date +%F_%T).out &> /dev/null && pass || fail
 
@@ -194,13 +205,13 @@ do_install() {
 
 	# create wrapper scripts
 	echo -n "creating wrapper scripts..."
-	for each in nova supernova supernova-keyring supernova-keyring-helper; do
-		cat <<- EOF | tee ${BIN_PATH}/${each} &> /dev/null
+	for SCRIPT in ${SCRIPTS[@]}; do
+		cat >> ${BIN_PATH}/${SCRIPT} <<-EOF
 		#!/bin/bash
 		. ${INSTALL_PATH}/bin/activate
-		${INSTALL_PATH}/bin/${each} \${@}
+		${INSTALL_PATH}/bin/${SCRIPT} \${@}
 		EOF
-		chmod +x ${BIN_PATH}/${each}
+		chmod +x ${BIN_PATH}/${SCRIPT}
 	done
 	pass
 
@@ -228,8 +239,10 @@ do_upgrade() {
 	${INSTALL_PATH}/bin/pip install --upgrade rackspace-novaclient &> /dev/null && pass || fail
 	echo -n "updating supernova..."
 	${INSTALL_PATH}/bin/pip install --upgrade supernova &> /dev/null && pass || fail
-	echo -n "updating supernova-keyring-helper..."
-	${INSTALL_PATH}/bin/pip install --upgrade ${HELPER_ADD_ON} &> /dev/null && pass || fail
+	if [[ ${WITH_KEYRING_HELPER} -eq 1 ]]; then
+		echo -n "updating supernova-keyring-helper..."
+		${INSTALL_PATH}/bin/pip install --upgrade ${HELPER_ADD_ON} &> /dev/null && pass || fail
+	fi
 	echo -n "saving pip freeze output..."
 	${INSTALL_PATH}/bin/pip freeze 2>&1 | tee ${INSTALL_PATH}/freeze.$(date +%s).out &> /dev/null && pass || fail
 
