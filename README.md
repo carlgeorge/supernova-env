@@ -8,7 +8,7 @@ Just download the script and put it in your path somewhere.
 
 ```
 MYSCRIPTS=~/.local/share/bin
-curl -s https://raw.github.com/cgtx/supernova-env/master/supernova-env > ${MYSCRIPTS}/supernova-env
+wget -P ${MYSCRIPTS} https://raw.github.com/cgtx/supernova-env/master/supernova-env
 chmod +x ${MYSCRIPTS}/supernova-env
 ```
 
