@@ -31,6 +31,6 @@ By default, the script will put wrapper scripts in ~/.local/share/bin and put th
 
     $ supernova-env install
     <--- script output --->
-    $ mv ~/.config/supernova{.sample,}
+    $ supernova-env template > ~/.config/supernova
     $ vim ~/.config/supernova
     <--- edit the config as necessary --->
