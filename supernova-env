@@ -81,6 +81,7 @@ set_variables() {
 
 	# https://wiki.gnome.org/Initiatives/GnomeGoals/XDGConfigFolders
 	DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
+	SAMPLE_CONFIG=${XDG_CONFIG_HOME:-${HOME}/.config}/supernova.sample
 
 	# various paths
 	BIN_PATH="${DATA_HOME}/bin" 		# path for wrapper scripts
@@ -145,8 +146,8 @@ pkg_test() {
 
 do_template() {
 	# create config file template
-	echo -n "creating configuration template file ~/.supernova.sample ..."
-	cat <<- EOF | tee ~/.supernova.sample &> /dev/null
+	echo -n "creating configuration template file ${SAMPLE_CONFIG} ..."
+	cat >> ${SAMPLE_CONFIG} <<-EOF
 	[mine]
 	OS_AUTH_SYSTEM=rackspace
 	OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
@@ -276,11 +277,11 @@ do_remove() {
 	done
 
 	# remove config file template
-	if [[ -f ~/.supernova.sample ]]; then
-		echo -n "remove configuration template file ${_bld}~/.supernova.sample${_res}? [y/N] "; read x
+	if [[ -f ${SAMPLE_CONFIG} ]]; then
+		echo -n "remove configuration template file ${_bld}${SAMPLE_CONFIG}${_res}? [y/N] "; read x
 		if [[ "${x}" == "y" ]]; then
 			echo -n "removing configuration template file..."
-			rm -f ~/.supernova.sample && pass || fail
+			rm -f ${SAMPLE_CONFIG} && pass || fail
 		fi
 	fi
 
