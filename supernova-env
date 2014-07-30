@@ -10,7 +10,7 @@ _res=$(tput sgr0)    # reset
 
 pass() {
 	# print a bold green check
-	PASS='\xE2\x9C\x94'
+	PASS="\xE2\x9C\x94"
 	echo -e "${_bld}${_gre}${PASS}${_res}"
 }
 
@@ -23,7 +23,7 @@ fail() {
 
 soft_fail() {
 	# print a bold red x, any additional text, and quit the script
-	FAIL='\xE2\x9C\x98'
+	FAIL="\xE2\x9C\x98"
 	echo -e "${_bld}${_red}${FAIL}${_res}"
 	if [[ -n "${1}" ]]; then
 		echo -e "${_bld}${1}${_res}"
@@ -48,24 +48,24 @@ set_variables() {
 
 	# set variables based on ID
 	case "${ID}" in
-		'arch')
+		"arch")
 			PYTHON="python2"
 			VIRTUALENV="virtualenv2"
 			TESTCMD="pacman -Q"
 			;;
-		'ubuntu'|'debian')
+		"ubuntu"|"debian")
 			PYTHON="python"
 			PYTHONDEV="python-dev"
 			VIRTUALENV="virtualenv"
 			TESTCMD="dpkg -s"
 			;;
-		'fedora')
+		"fedora")
 			PYTHON="python"
 			PYTHONDEV="python-devel"
 			VIRTUALENV="virtualenv"
 			TESTCMD="rpm -q"
 			;;
-		'centos'|'redhat')
+		"centos"|"redhat")
 			PYTHON="python27"
 			PYTHONDEV="python27-devel"
 			VIRTUALENV="virtualenv-2.7"
